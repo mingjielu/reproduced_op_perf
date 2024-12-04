@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from flash_attn import flash_attn_func,FusedAttnFunc
+from flash_attn import flash_attn_func
 import time
 import numpy as np 
 from torch.profiler import profile, record_function, ProfilerActivity
@@ -24,8 +24,7 @@ def fwd(q, k, v, attn_mask):
     times = []
     torch.cuda.synchronize()
     forward_start = time.time()
-    #output = flash_attn_func(q,k,v)
-    output = FusedAttnFunc(q,k,v)
+    output = flash_attn_func(q,k,v)
     #q = q.permute(0,2,1,3)
     #k = k.permute(0,2,1,3)
     #v = v.permute(0,2,1,3)

@@ -14,6 +14,8 @@ configs = [
         ((2,24,2048,64),torch.float16),
         ((1,24,4250,64),torch.float16),
         ((2,24,4250,64),torch.float16),
+        ((1,24,4096,128),torch.float16), #moe_18b
+
         ] 
  
 def fwd(q, k, v, attn_mask):

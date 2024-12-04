@@ -1,6 +1,6 @@
 import time
 import torch
-
+torch.manual_seed(0)
 configs = [
         {'tensor_size_a': (2,4096,1536), 'tensor_size_b': (2,4096,1536), 'dtype_a': torch.half, 'dtype_b': torch.half},
         {'tensor_size_a': (2,4096,1536), 'tensor_size_b': (2,1,1536), 'dtype_a': torch.half, 'dtype_b': torch.half},
@@ -27,6 +27,7 @@ for config in configs:
 
     for _ in range(repeats):
         c = a + b  # ~H~V使~T torch.add(a, b)
+    print(c)
 
     torch.cuda.synchronize()
     end = time.time()
