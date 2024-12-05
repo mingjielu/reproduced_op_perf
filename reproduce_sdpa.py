@@ -6,12 +6,20 @@ torch.manual_seed(0)
 torch.backends.cuda.preferred_rocm_fa_library("ck")
 configs = [
         #((2,32,36480,64),torch.float16),
-        ((1, 32, 36480, 72),torch.float16),
-        ((1,16,2048,64),torch.float16),
-        ((1,24,2048,64),torch.float16),
-        ((2,24,2048,64),torch.float16),
-        ((1,24,4250,64),torch.float16),
-        ((2,24,4250,64),torch.float16),
+        ((1, 32, 36480, 72),torch.float16), # dit-megatron F.sdpa
+        ((1,16,2048,64),torch.float16), # benchmark
+        ((1,24,2048,64),torch.float16), # benchmark
+        ((2,24,2048,64),torch.float16), # benchmark
+        ((1,24,4250,64),torch.float16), # sd3 F.sdpa
+        ((2,24,4250,64),torch.float16), # sd3 F.sdpa
+        ((1,24,4096,128),torch.float16), # benchmark
+        ((32,40,1024,128),torch.bfloat16), # qwen-14b fa
+        ((7,32,2048,128),torch.bfloat16), # llama7b te-fa
+        ((2,32,2048,128),torch.bfloat16), # llama7b te-fa
+        ((1,24,4096,128),torch.bfloat16), # moe-18b fa
+        ((192,16,577,64),torch.bfloat16), # clip F.sdpa
+        ((40,18,632,128),torch.bfloat16), # dit-pytorch F.sdpa
+        ((2,18,8840,128),torch.bfloat16), # dit-pytorch F.sdpa
         ] 
  
 def fwd(q, k, v, attn_mask):
