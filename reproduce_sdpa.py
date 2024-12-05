@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import time
 import numpy as np 
 torch.manual_seed(0)
-torch.backends.cuda.preferred_rocm_fa_library("ck")
+#torch.backends.cuda.preferred_rocm_fa_library("ck")
 configs = [
         #((2,32,36480,64),torch.float16),
         ((1, 32, 36480, 72),torch.float16), # dit-megatron F.sdpa

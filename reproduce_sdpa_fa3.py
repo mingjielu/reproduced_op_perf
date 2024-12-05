@@ -21,6 +21,7 @@ configs = [
         ((192,16,577,64),torch.bfloat16), # clip F.sdpa
         ((40,18,632,128),torch.bfloat16), # dit-pytorch F.sdpa
         ((2,18,8840,128),torch.bfloat16), # dit-pytorch F.sdpa
+        ((64,28,1024,128),torch.bfloat16), # qwen-57b fa
         ] 
  
 def fwd(q, k, v, attn_mask):
