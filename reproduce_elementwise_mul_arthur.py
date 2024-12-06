@@ -133,7 +133,8 @@ def triton_mul(a, b):
 
     if ashape==[4096,1,3072] and bshape==[1]:
         c = torch.empty((ashape[0], ashape[1], ashape[2]), device=a.device, dtype=a.dtype)
-        config = {'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_K': 32, 'matrix_instr_nonkdim': 32, 'kpack': 2, 'waves_per_eu': 0, 'num_stages': 1} 
+        # config = {'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_K': 32, 'matrix_instr_nonkdim': 32, 'kpack': 2, 'waves_per_eu': 0, 'num_stages': 1} 
+        config = {'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_K': 256, 'matrix_instr_nonkdim': 32, 'kpack': 2, 'waves_per_eu': 8, 'num_stages': 2} # 0.04675865173339844
         grid = lambda META: (triton.cdiv(ashape[0], META['BLOCK_SIZE_M']) * triton.cdiv(ashape[2], META['BLOCK_SIZE_K']), )
         mul_kernel_3[grid](
             a, b, c,  #
@@ -145,7 +146,8 @@ def triton_mul(a, b):
         return c
     elif ashape==[32768, 3072] and bshape==[32768, 1]:
         
-        config = {'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_K': 256, 'matrix_instr_nonkdim': 16, 'kpack': 2, 'waves_per_eu': 16, 'num_stages': 1}
+        # config = {'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_K': 256, 'matrix_instr_nonkdim': 16, 'kpack': 2, 'waves_per_eu': 16, 'num_stages': 1}
+        config = {'BLOCK_SIZE_M': 64, 'BLOCK_SIZE_K': 256, 'matrix_instr_nonkdim': 16, 'kpack': 1, 'waves_per_eu': 8, 'num_stages': 2} # 0.1852560043334961
         c = torch.empty((ashape[0], ashape[1]), device=a.device, dtype=a.dtype)
         # 1D launch kernel where each block gets its own program.
         grid = lambda META: (triton.cdiv(ashape[0], META['BLOCK_SIZE_M']) * triton.cdiv(ashape[1], META['BLOCK_SIZE_K']), )
@@ -160,7 +162,8 @@ def triton_mul(a, b):
         return c
     elif ashape==[32768, 3072] and bshape==[32768, 3072]:
         c = torch.empty((ashape[0], ashape[1]), device=a.device, dtype=a.dtype)
-        config={'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_K': 256, 'matrix_instr_nonkdim': 16, 'kpack': 1, 'waves_per_eu': 8, 'num_stages': 1}
+        # config={'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_K': 256, 'matrix_instr_nonkdim': 16, 'kpack': 1, 'waves_per_eu': 8, 'num_stages': 1}
+        config = {'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_K': 256, 'matrix_instr_nonkdim': 32, 'kpack': 2, 'waves_per_eu': 2, 'num_stages': 2} # 0.22263050079345703
         grid = lambda META: (triton.cdiv(ashape[0], META['BLOCK_SIZE_M']) * triton.cdiv(ashape[1], META['BLOCK_SIZE_K']), )
         mul_kernel_1[grid](
             a, b, c,  #
