@@ -40,7 +40,7 @@ def mul_kernel_1(
     a = tl.load(a_ptrs, mask=(offset_am[:,None]<M) & (offset_k[None, :] < K), other=0.0, )
     b = tl.load(b_ptrs, mask=(offset_am[:,None]<M) & (offset_k[None, :] < K), other=0.0, )
     bias = tl.zeros((BLOCK_SIZE_M, BLOCK_SIZE_K), dtype=tl.float32)
-    res = tl.fma(a, b, bias)    
+    res = tl.fma(a, b, bias)
     c_ptrs = c_ptr + (offset_am[:,None] * stride_cm + offset_k[None,:] * stride_ck)
     
     tl.store(c_ptrs, res, mask=(offset_am[:,None]<M) & (offset_k[None, :] < K))
@@ -82,7 +82,7 @@ def mul_kernel_2(
     b = tl.load(b_ptrs, mask=(offset_am[:,None]<M) & (offset_n[None, :]<1), other=0.0, )
     bias = tl.zeros((BLOCK_SIZE_M, BLOCK_SIZE_K), dtype=tl.float32)
     tmp=tl.broadcast_to(b, (BLOCK_SIZE_M, BLOCK_SIZE_K))
-    res = tl.fma(a, tmp, bias)    
+    res = tl.fma(a, tmp, bias)   
     c_ptrs = c_ptr + (offset_am[:,None] * stride_am + offset_k[None,:] * stride_ak)
     tl.store(c_ptrs, res, mask=(offset_am[:,None]<M) & (offset_k[None, :] < K))
     
@@ -119,24 +119,25 @@ def mul_kernel_3(
     b_ptrs = b_ptr
     
     a = tl.load(a_ptrs, mask=(offset_am[:, None, None]<M) & offset_n[None, :, None]<1 & (offset_k[None, None, :] < K), other=0.0, )
-    b = tl.load(b_ptrs)
-    # bias = tl.zeros((BLOCK_SIZE_M, 1, BLOCK_SIZE_K), dtype=tl.float32)
-    # tmp=tl.broadcast_to(b, (BLOCK_SIZE_M, 1, BLOCK_SIZE_K))
-    res = a*b 
+    b = tl.load(b_ptrs).to(tl.bfloat16)
+    tmp=tl.broadcast_to(b, (BLOCK_SIZE_M, 1, BLOCK_SIZE_K))
+    res = a*b
     c_ptrs = c_ptr + (offset_am[:,None, None] * stride_cm + offset_n[None, :, None] * stride_cn + offset_k[None,None,:] * stride_ck)
     tl.store(c_ptrs, res, mask=(offset_am[:, None, None]<M) & (offset_n[None, :, None]<1) &(offset_k[None, None,:] < K))
+    
+    
 
 def triton_mul(a, b):
     ashape = list(a.shape)
     bshape = list(b.shape)
 
     if ashape==[4096,1,3072] and bshape==[1]:
-        c = torch.empty((ashape[0], ashape[1], ashape[1]), device=a.device, dtype=torch.float16)
+        c = torch.empty((ashape[0], ashape[1], ashape[2]), device=a.device, dtype=a.dtype)
         config = {'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_K': 32, 'matrix_instr_nonkdim': 32, 'kpack': 2, 'waves_per_eu': 0, 'num_stages': 1} 
         grid = lambda META: (triton.cdiv(ashape[0], META['BLOCK_SIZE_M']) * triton.cdiv(ashape[2], META['BLOCK_SIZE_K']), )
         mul_kernel_3[grid](
             a, b, c,  #
-            ashape[0], ashape[1], ashape[1],  #
+            ashape[0], ashape[1], ashape[2],  #
             a.stride(0), a.stride(1), a.stride(2) , #
             c.stride(0), c.stride(1), c.stride(2) ,#
             **config
@@ -145,7 +146,7 @@ def triton_mul(a, b):
     elif ashape==[32768, 3072] and bshape==[32768, 1]:
         
         config = {'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_K': 256, 'matrix_instr_nonkdim': 16, 'kpack': 2, 'waves_per_eu': 16, 'num_stages': 1}
-        c = torch.empty((ashape[0], ashape[1]), device=a.device, dtype=torch.float16)
+        c = torch.empty((ashape[0], ashape[1]), device=a.device, dtype=a.dtype)
         # 1D launch kernel where each block gets its own program.
         grid = lambda META: (triton.cdiv(ashape[0], META['BLOCK_SIZE_M']) * triton.cdiv(ashape[1], META['BLOCK_SIZE_K']), )
         mul_kernel_2[grid](
@@ -158,7 +159,7 @@ def triton_mul(a, b):
         )
         return c
     elif ashape==[32768, 3072] and bshape==[32768, 3072]:
-        c = torch.empty((ashape[0], ashape[1]), device=a.device, dtype=torch.float16)
+        c = torch.empty((ashape[0], ashape[1]), device=a.device, dtype=a.dtype)
         config={'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_K': 256, 'matrix_instr_nonkdim': 16, 'kpack': 1, 'waves_per_eu': 8, 'num_stages': 1}
         grid = lambda META: (triton.cdiv(ashape[0], META['BLOCK_SIZE_M']) * triton.cdiv(ashape[1], META['BLOCK_SIZE_K']), )
         mul_kernel_1[grid](
@@ -172,6 +173,16 @@ def triton_mul(a, b):
         return c
     else:
         return a*b
+
+def precision(a, b):
+    torch_res = a * b
+    triton_res = triton_mul(a,b)
+    diff = torch_res.eq(triton_res)
+    # assert diff.all()
+    if not diff.all():
+        print(torch_res)
+        print(triton_res)
+
 
 def main():
     configs = [
@@ -190,6 +201,8 @@ def main():
         a = a.contiguous()
         b = b.contiguous()
 
+        precision(a, b)
+        
         warmup = 10
         repeats = 50  # ~G~M~M次~U~L确~]计~W稳~Z
 
