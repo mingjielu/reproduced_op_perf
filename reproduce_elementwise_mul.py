@@ -10,7 +10,7 @@ configs = [
 #custom_mul=torch.mul
 #custom_mul=torch.compile(torch.mul,mode='max-autotune')
 custom_mul=torch.compile(torch.mul)
-#torch.mul=custom_mul
+torch.mul=custom_mul
 for config in configs:
     a = torch.randn(config['tensor_size_a'], device='cuda', dtype=config['dtype_a'])
     if config['dtype_b'] not in [torch.int32, torch.int64]:
@@ -25,16 +25,16 @@ for config in configs:
     repeats = 50  # ~G~M~M次~U~L确~]计~W稳~Z
 
     for _ in range(warmup):
-        c = custom_mul(a , b)  # ~H~V使~T torch.add(a, b)
-        #c = torch.mul(a , b)  # ~H~V使~T torch.add(a, b)
+        #c = custom_mul(a , b)  # ~H~V使~T torch.add(a, b)
+        c = torch.mul(a , b)  # ~H~V使~T torch.add(a, b)
         #c = a * b  # ~H~V使~T torch.add(a, b)
 
     torch.cuda.synchronize()
     start = time.time()
 
     for _ in range(repeats):
-        c = custom_mul(a , b)  # ~H~V使~T torch.add(a, b)
-        #c = torch.mul(a , b)  # ~H~V使~T torch.add(a, b)
+        #c = custom_mul(a , b)  # ~H~V使~T torch.add(a, b)
+        c = torch.mul(a , b)  # ~H~V使~T torch.add(a, b)
         #c = a * b  # ~H~V使~T torch.add(a, b)
 
     torch.cuda.synchronize()

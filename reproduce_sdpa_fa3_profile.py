@@ -57,7 +57,8 @@ def call(q, k, v, attn_mask, warmup, cnt):
             bwd_time = bwd(out)
             fwd_times.append(fwd_time)
             bwd_times.append(bwd_time)
-    print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10,max_name_column_width=None))
+    print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
+    #print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10,max_name_column_width=None))
     return ('fwd ', float(np.round(np.mean(fwd_times),4)), 'bwd ' ,float(np.round(np.mean(bwd_times),4)))
 
 if __name__ == '__main__':

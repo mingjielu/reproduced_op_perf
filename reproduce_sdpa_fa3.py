@@ -4,23 +4,23 @@ from flash_attn import flash_attn_func
 import time
 import numpy as np 
 from torch.profiler import profile, record_function, ProfilerActivity
-torch.manual_seed(0)
+torch.manual_seed(10)
 configs = [
         #((2,32,36480,64),torch.float16),
-        ((1, 32, 36480, 72),torch.float16), # dit-megatron F.sdpa
-        ((1,16,2048,64),torch.float16), # benchmark
-        ((1,24,2048,64),torch.float16), # benchmark
-        ((2,24,2048,64),torch.float16), # benchmark
-        ((1,24,4250,64),torch.float16), # sd3 F.sdpa
-        ((2,24,4250,64),torch.float16), # sd3 F.sdpa
-        ((1,24,4096,128),torch.float16), # benchmark
-        ((32,40,1024,128),torch.bfloat16), # qwen-14b fa
-        ((7,32,2048,128),torch.bfloat16), # llama7b te-fa
-        ((2,32,2048,128),torch.bfloat16), # llama7b te-fa
-        ((1,24,4096,128),torch.bfloat16), # moe-18b fa
-        ((192,16,577,64),torch.bfloat16), # clip F.sdpa
-        ((40,18,632,128),torch.bfloat16), # dit-pytorch F.sdpa
-        ((2,18,8840,128),torch.bfloat16), # dit-pytorch F.sdpa
+        #((1, 32, 36480, 72),torch.float16), # dit-megatron F.sdpa
+        #((1,16,2048,64),torch.float16), # benchmark
+        #((1,24,2048,64),torch.float16), # benchmark
+        #((2,24,2048,64),torch.float16), # benchmark
+        #((1,24,4250,64),torch.float16), # sd3 F.sdpa
+        #((2,24,4250,64),torch.float16), # sd3 F.sdpa
+        #((1,24,4096,128),torch.float16), # benchmark
+        #((32,40,1024,128),torch.bfloat16), # qwen-14b fa
+        #((7,32,2048,128),torch.bfloat16), # llama7b te-fa
+        #((2,32,2048,128),torch.bfloat16), # llama7b te-fa
+        #((1,24,4096,128),torch.bfloat16), # moe-18b fa
+        #((192,16,577,64),torch.bfloat16), # clip F.sdpa
+        #((40,18,632,128),torch.bfloat16), # dit-pytorch F.sdpa
+        #((2,18,8840,128),torch.bfloat16), # dit-pytorch F.sdpa
         ((64,28,1024,128),torch.bfloat16), # qwen-57b fa
         ] 
  
@@ -28,13 +28,13 @@ def fwd(q, k, v, attn_mask):
     times = []
     torch.cuda.synchronize()
     forward_start = time.time()
-    output = flash_attn_func(q,k,v)
-    #q = q.permute(0,2,1,3)
-    #k = k.permute(0,2,1,3)
-    #v = v.permute(0,2,1,3)
-    #output2 = F.scaled_dot_product_attention(q, k, v, attn_mask=attn_mask)
-    #output2 = output2.permute(0,2,1,3)
-    #print(torch.abs(output2-output).mean())
+    output = flash_attn_func(q,k,v,causal=True)
+    q = q.permute(0,2,1,3)
+    k = k.permute(0,2,1,3)
+    v = v.permute(0,2,1,3)
+    output2 = F.scaled_dot_product_attention(q, k, v, attn_mask=attn_mask,is_causal=True)
+    output2 = output2.permute(0,2,1,3)
+    print(torch.abs(output2-output).mean())
     torch.cuda.synchronize()
     forward_end = time.time()
     return output, forward_end - forward_start
