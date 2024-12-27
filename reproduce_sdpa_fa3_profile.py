@@ -4,10 +4,6 @@ from flash_attn import flash_attn_func
 import time
 import numpy as np 
 from torch.profiler import profile, record_function, ProfilerActivity
-import pandas as pd
-pd.set_option('display.max_rows', None)      # 显示所有行
-pd.set_option('display.max_columns', None)  # 显示所有列
-pd.set_option('display.max_colwidth', None)
 torch.manual_seed(0)
 configs = [
         #((2,32,36480,64),torch.float16),
@@ -17,14 +13,15 @@ configs = [
         #((2,24,2048,64),torch.float16),
         #((1,24,4250,64),torch.float16),
         #((2,24,4250,64),torch.float16),
-        ((7,32,2048,128),torch.bfloat16),
+        #((7,32,2048,128),torch.bfloat16),
+        ((42,25,1024,64),torch.bfloat16),
         ] 
  
 def fwd(q, k, v, attn_mask):
     times = []
     torch.cuda.synchronize()
     forward_start = time.time()
-    output = flash_attn_func(q,k,v)
+    output = flash_attn_func(q,k,v,causal=True)
     #q = q.permute(0,2,1,3)
     #k = k.permute(0,2,1,3)
     #v = v.permute(0,2,1,3)

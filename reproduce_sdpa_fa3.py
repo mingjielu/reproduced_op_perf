@@ -22,6 +22,8 @@ configs = [
         ((40,18,632,128),torch.bfloat16), # dit-pytorch F.sdpa
         ((2,18,8840,128),torch.bfloat16), # dit-pytorch F.sdpa
         ((64,28,1024,128),torch.bfloat16), # qwen-57b fa
+        ((42,25,1024,64),torch.bfloat16), # gpt2 fa
+
         ] 
  
 def fwd(q, k, v, attn_mask):
@@ -29,12 +31,6 @@ def fwd(q, k, v, attn_mask):
     torch.cuda.synchronize()
     forward_start = time.time()
     output = flash_attn_func(q,k,v,causal=True)
-    #q = q.permute(0,2,1,3)
-    #k = k.permute(0,2,1,3)
-    #v = v.permute(0,2,1,3)
-    #output2 = F.scaled_dot_product_attention(q, k, v, attn_mask=attn_mask,is_causal=True)
-    #output2 = output2.permute(0,2,1,3)
-    #print(torch.abs(output2-output).mean(),torch.abs(output2-output).max())
     torch.cuda.synchronize()
     forward_end = time.time()
     return output, forward_end - forward_start
