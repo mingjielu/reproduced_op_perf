@@ -8,8 +8,6 @@ configs = [
         #{"input_shape":(4, 512, 200, 100), "weight_shape":(512, 640, 3, 3,), "stride_x": (6400000, 10000, 100, 1), "stride_w": (5760, 9, 3, 1), "dtype": torch.float32},
         #{"input_shape":(4, 640, 100, 100), "weight_shape":(512, 640, 3, 3,), "stride_x": (6400000, 10000, 100, 1), "stride_w": (5760, 9, 3, 1), "dtype": torch.float32},
         ]
-points = torch.randn(4,6,88,16,44,3,1,device='cuda',dtype=torch.float32)
-post_rots = torch.randn(4,6,1,1,1,3,3,device='cuda',dtype=torch.float32)
 
 for config in configs:
     input_tensor = torch.rand(config["input_shape"], dtype=config["dtype"]).to('cuda')
