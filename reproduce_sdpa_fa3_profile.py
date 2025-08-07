@@ -14,7 +14,8 @@ configs = [
         #((1,24,4250,64),torch.float16),
         #((2,24,4250,64),torch.float16),
         #((7,32,2048,128),torch.bfloat16),
-        ((42,25,1024,64),torch.bfloat16),
+        #((42,25,1024,64),torch.bfloat16),
+        ((2,32,8192, 128),torch.bfloat16),
         ] 
  
 def fwd(q, k, v, attn_mask):
@@ -64,4 +65,5 @@ if __name__ == '__main__':
         q = torch.randn(b,e,n,d, dtype=config[1], device='cuda', requires_grad=True)
         k = torch.randn(b,e,n,d, dtype=config[1], device='cuda', requires_grad=True)
         v = torch.randn(b,e,n,d, dtype=config[1], device='cuda', requires_grad=True)
+        print(q.shape,q.stride())
         print(config, call(q, k, v, None,3, 5))
