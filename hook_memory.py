@@ -7,7 +7,7 @@ def register_weight_hooks(model):
                 print(f"{n}",
                       f"allocated={mem_allocated:.2f}MB, reserved={mem_reserved:.2f}MB")
             return hook
-          module.register_forward_hook(make_hook(name, module)
+        module.register_forward_hook(make_hook(name, module)
 
       for name, param in model.named_parameters():
         if param.requires_grad:
