@@ -9,7 +9,7 @@ def register_weight_hooks(model):
             return hook
         module.register_forward_hook(make_hook(name, module)
 
-      for name, param in model.named_parameters():
+    for name, param in model.named_parameters():
         if param.requires_grad:
             def make_hook(n):
                 def hook(grad):
