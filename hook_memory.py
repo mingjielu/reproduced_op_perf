@@ -1,4 +1,4 @@
-def register_weight_hooks(model):
+def register_hooks(model):
     for name, module in model.named_modules():
         def make_hook(n, m):
             def hook(module, input, output):
