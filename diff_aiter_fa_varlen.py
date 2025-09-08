@@ -76,5 +76,24 @@ Self CUDA time total: 7.842ms
 q_grad/q_grad2 is nan:  tensor(False, device='cuda:0') tensor(False, device='cuda:0')
 diff output, mean/max:  2.7179718017578125e-05 0.015625
 diff grad,  mean/max:  0.04150390625 3.25
+
+
+######## h20 fa_varlen
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------
+autograd::engine::evaluate_function: FlashAttnVarlen...         0.16%       9.682us         6.31%     379.074us     379.074us       0.000us         0.00%       3.039ms       3.039ms             1
+                            FlashAttnVarlenFuncBackward         1.64%      98.499us         6.15%     369.392us     369.392us       0.000us         0.00%       3.039ms       3.039ms             1
+                flash_attn::_flash_attn_varlen_backward         2.86%     171.752us         4.14%     248.830us     248.830us       3.011ms        68.34%       3.039ms       3.039ms             1
+void flash_bwd_dq_dk_dv_loop_seqk_parallel_kernel<Fl...         0.00%       0.000us         0.00%       0.000us       0.000us       2.933ms        66.58%       2.933ms       2.933ms             1
+                                    FlashAttnVarlenFunc         1.46%      87.955us        36.10%       2.168ms       2.168ms       0.000us         0.00%       1.257ms       1.257ms             1
+                 flash_attn::_flash_attn_varlen_forward         2.82%     169.324us        34.54%       2.074ms       2.074ms       1.257ms        28.53%       1.257ms       1.257ms             1
+void flash_fwd_kernel<Flash_fwd_kernel_traits<128, 1...         0.00%       0.000us         0.00%       0.000us       0.000us       1.257ms        28.53%       1.257ms       1.257ms             1
+autograd::engine::evaluate_function: torch::autograd...         0.13%       7.753us         0.83%      49.772us      16.591us       0.000us         0.00%      72.576us      24.192us             3
+                        torch::autograd::AccumulateGrad         0.24%      14.216us         0.70%      42.019us      14.006us       0.000us         0.00%      72.576us      24.192us             3
+                                             aten::add_         0.24%      14.407us         0.46%      27.803us       9.268us      72.576us         1.65%      72.576us      24.192us             3
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------
+Self CPU time total: 6.004ms
+Self CUDA time total: 4.405ms
 '''
 
