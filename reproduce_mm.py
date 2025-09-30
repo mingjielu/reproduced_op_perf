@@ -1,33 +1,27 @@
 import torch
-import time
+from torch.profiler import profile, record_function, ProfilerActivity
+
 
 configs = [
-        {'tensor_size_a': (32768,5120), 'tensor_size_b': (5120,152064), 'dtype_a': torch.bfloat16, 'dtype_b': torch.bfloat16},
+        {'tensor_size_a': (32768,5120),  'dtype_a': torch.bfloat16, 'tensor_size_b': (5120,152064), 'dtype_b': torch.bfloat16},
         ]
 
 for config in configs:
     a = torch.randn(config['tensor_size_a'], device='cuda', dtype=config['dtype_a'])
-    if config['dtype_b'] not in [torch.int32, torch.int64]:
-        b = torch.randn(config['tensor_size_b'], device='cuda', dtype=config['dtype_b'])
-    else:
-        b = torch.randint(0, 1000, config['tensor_size_b'], device='cuda', dtype=config['dtype_b'])
+    b = torch.randn(config['tensor_size_b'], device='cuda', dtype=config['dtype_b'])
 
-    a = a.contiguous()
-    b = b.contiguous()
 
     warmup = 10
-    repeats = 50  # ~G~M~M次~U~L确~]计~W稳~Z
+    repeats = 50  # 
 
     for _ in range(warmup):
-        c = torch.mm(a, b)  # ~H~V使~T torch.add(a, b)
+        c = torch.mm(a, b)  
+        c.sum().backward()
 
-    torch.cuda.synchronize()
-    start = time.time()
 
-    for _ in range(repeats):
-        c = torch.mm(a , b)  # ~H~V使~T torch.add(a, b)
+    with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], with_stack=True) as prof:
+        for _ in range(repeats):
+            c = torch.mm(a , b)  # ~H~V使~T torch.add(a, b)
+            c.sum().backward()
+    print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
 
-    torch.cuda.synchronize()
-    end = time.time()
-
-    print(config, f"Averaged execution time for aten::mul: {(end - start) / repeats * 1000:.3f} ms")
