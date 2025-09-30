@@ -47,40 +47,40 @@ print('diff grad,  mean/max: ', (q_grad2-q_grad).abs().mean().item(),(q_grad2-q_
 -------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------
                                                    Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls
 -------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------
-autograd::engine::evaluate_function: FlashAttnVarlen...         0.27%      24.484us         8.28%     748.040us     748.040us       0.000us         0.00%       7.301ms       7.301ms             1
-                            FlashAttnVarlenFuncBackward         1.88%     169.978us         8.00%     723.556us     723.556us       0.000us         0.00%       7.301ms       7.301ms             1
-                flash_attn::_flash_attn_varlen_backward         4.19%     379.014us         5.68%     513.395us     513.395us       7.218ms        77.03%       7.301ms       7.301ms             1
-void ck_tile::kentry<256, 1, ck_tile::FmhaBwdDQDKDVK...         0.00%       0.000us         0.00%       0.000us       0.000us       7.100ms        75.78%       7.100ms       7.100ms             1
-                                    FlashAttnVarlenFunc         0.81%      72.970us         2.97%     268.402us     268.402us       0.000us         0.00%       1.619ms       1.619ms             1
-                 flash_attn::_flash_attn_varlen_forward         1.47%     132.711us         2.10%     189.921us     189.921us       1.619ms        17.28%       1.619ms       1.619ms             1
-void ck_tile::kentry<256, 2, ck_tile::FmhaFwdKernel<...         0.00%       0.000us         0.00%       0.000us       0.000us       1.619ms        17.28%       1.619ms       1.619ms             1
-                                              aten::sum         0.42%      37.633us         0.61%      55.167us      55.167us     358.560us         3.83%     358.560us     358.560us             1
-void at::native::reduce_kernel<512, 1, at::native::R...         0.00%       0.000us         0.00%       0.000us       0.000us     350.121us         3.74%     350.121us     350.121us             1
-void ck_tile::kentry<64, 2, ck_tile::FmhaBwdOGradDot...         0.00%       0.000us         0.00%       0.000us       0.000us      89.119us         0.95%      89.119us      89.119us             1
+autograd::engine::evaluate_function: FlashAttnVarlen...         0.29%      23.426us         9.68%     769.486us     769.486us       0.000us         0.00%       6.742ms       6.742ms             1
+                            FlashAttnVarlenFuncBackward         2.20%     174.545us         9.39%     746.060us     746.060us       0.000us         0.00%       6.742ms       6.742ms             1
+                flash_attn::_flash_attn_varlen_backward         4.99%     396.759us         6.67%     530.165us     530.165us       6.692ms        81.07%       6.742ms       6.742ms             1
+void ck_tile::kentry<256, 1, ck_tile::FmhaBwdDQDKDVK...         0.00%       0.000us         0.00%       0.000us       0.000us       6.568ms        79.58%       6.568ms       6.568ms             1
+                                    FlashAttnVarlenFunc         1.02%      80.735us         3.96%     314.447us     314.447us       0.000us         0.00%       1.390ms       1.390ms             1
+                 flash_attn::_flash_attn_varlen_forward         1.97%     156.668us         2.85%     226.272us     226.272us       1.390ms        16.83%       1.390ms       1.390ms             1
+void ck_tile::kentry<256, 2, ck_tile::FmhaFwdKernel<...         0.00%       0.000us         0.00%       0.000us       0.000us       1.390ms        16.83%       1.390ms       1.390ms             1
+void ck_tile::kentry<64, 2, ck_tile::FmhaBwdOGradDot...         0.00%       0.000us         0.00%       0.000us       0.000us      94.560us         1.15%      94.560us      94.560us             1
+autograd::engine::evaluate_function: torch::autograd...         0.25%      20.216us         1.85%     147.071us      49.024us       0.000us         0.00%      61.719us      20.573us             3
+                        torch::autograd::AccumulateGrad         0.95%      75.607us         1.60%     126.855us      42.285us       0.000us         0.00%      61.719us      20.573us             3
 -------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------
-Self CPU time total: 9.039ms
-Self CUDA time total: 9.370ms
+Self CPU time total: 7.949ms
+Self CUDA time total: 8.254ms
 
 -------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------
                                                    Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls
 -------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------
-autograd::engine::evaluate_function: FlashAttnVarlen...         0.35%      20.274us        12.94%     740.965us     740.965us       0.000us         0.00%       2.959ms       2.959ms             1
-                            FlashAttnVarlenFuncBackward         4.17%     238.605us        12.58%     720.691us     720.691us       0.000us         0.00%       2.959ms       2.959ms             1
-                      aiter::wrapper_fmha_v3_varlen_bwd         1.86%     106.448us         6.68%     382.666us     382.666us       2.872ms        48.57%       2.895ms       2.895ms             1
-aiter::fmha_bwd_hd128_bf16_causal_br_a32_rtna_pssk_g...         0.00%       0.000us         0.00%       0.000us       0.000us       2.752ms        46.56%       2.752ms       2.752ms             1
-                                    FlashAttnVarlenFunc         1.61%      92.015us         3.17%     181.337us     181.337us       0.000us         0.00%       2.642ms       2.642ms             1
-                      aiter::wrapper_fmha_v3_varlen_fwd         0.85%      48.606us         1.47%      84.115us      84.115us       2.642ms        44.69%       2.642ms       2.642ms             1
-           aiter::fmha_fwd_hd128_bf16_causal_rtna_group         0.00%       0.000us         0.00%       0.000us       0.000us       2.642ms        44.69%       2.642ms       2.642ms             1
-                                            aten::clone         0.15%       8.626us         0.93%      53.412us      26.706us       0.000us         0.00%     202.119us     101.060us             2
-                                            aten::copy_         0.31%      17.704us         0.56%      31.917us      15.958us     202.119us         3.42%     202.119us     101.060us             2
-                         Memcpy DtoD (Device -> Device)         0.00%       0.000us         0.00%       0.000us       0.000us     143.880us         2.43%     143.880us     143.880us             1
+autograd::engine::evaluate_function: FlashAttnVarlen...         0.47%      21.059us        16.33%     737.635us     737.635us       0.000us         0.00%       2.614ms       2.614ms             1
+                            FlashAttnVarlenFuncBackward         5.72%     258.371us        15.87%     716.576us     716.576us       0.000us         0.00%       2.614ms       2.614ms             1
+                      aiter::wrapper_fmha_v3_varlen_bwd         2.40%     108.288us         7.65%     345.356us     345.356us       2.559ms        54.34%       2.583ms       2.583ms             1
+aiter::fmha_bwd_hd128_bf16_causal_br_a32_rtna_pssk_g...         0.00%       0.000us         0.00%       0.000us       0.000us       2.443ms        51.87%       2.443ms       2.443ms             1
+                                    FlashAttnVarlenFunc         2.05%      92.630us         3.98%     179.785us     179.785us       0.000us         0.00%       1.978ms       1.978ms             1
+                      aiter::wrapper_fmha_v3_varlen_fwd         1.05%      47.242us         1.81%      81.796us      81.796us       1.978ms        42.00%       1.978ms       1.978ms             1
+           aiter::fmha_fwd_hd128_bf16_causal_rtna_group         0.00%       0.000us         0.00%       0.000us       0.000us       1.978ms        42.00%       1.978ms       1.978ms             1
+_ZN7ck_tile6kentryILi2ENS_22FmhaBwdOGradDotOKernelIN...         0.00%       0.000us         0.00%       0.000us       0.000us      88.960us         1.89%      88.960us      88.960us             1
+autograd::engine::evaluate_function: torch::autograd...         0.42%      18.947us         1.93%      87.343us      29.114us       0.000us         0.00%      61.118us      20.373us             3
+                        torch::autograd::AccumulateGrad         0.56%      25.365us         1.51%      68.396us      22.799us       0.000us         0.00%      61.118us      20.373us             3
 -------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------
-Self CPU time total: 5.728ms
-Self CUDA time total: 5.912ms
+Self CPU time total: 4.516ms
+Self CUDA time total: 4.710ms
 
 q_grad/q_grad2 is nan:  tensor(False, device='cuda:0') tensor(False, device='cuda:0')
-diff output, mean/max:  2.7179718017578125e-05 0.015625
-diff grad,  mean/max:  0.000118255615234375 0.015625
+diff output, mean/max:  2.7179718017578125e-05 0.0078125
+diff grad,  mean/max:  0.00011777877807617188 0.015625
 
 
 ######## h20 fa_varlen
